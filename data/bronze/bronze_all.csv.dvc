@@ -1,0 +1,3 @@
+outs:
+- md5: 630e006ad7e5f21c683f9c736d3e45ed
+  path: bronze_all.csv

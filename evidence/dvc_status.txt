@@ -1,0 +1,47 @@
+data\silver\silver_all.csv.dvc
+outs:
+- md5: 630e006ad7e5f21c683f9c736d3e45ed
+  path: silver_all.csv
+---
+
+data\gold\gold.csv.dvc
+outs:
+- md5: 1ba8b7aab042af87d35f901999a8101e
+  path: gold.csv
+---
+
+data\bronze\bronze_all.csv.dvc
+outs:
+- md5: 630e006ad7e5f21c683f9c736d3e45ed
+  path: bronze_all.csv
+---
+
+data\bronze\raw_batch_01.csv.dvc
+outs:
+- md5: cb94c343cdadde5e8e2df23e1472fddc
+  path: raw_batch_01.csv
+---
+
+data\bronze\raw_batch_02.csv.dvc
+outs:
+- md5: 802d9e68e10a327932f67cca0012ae4e
+  path: raw_batch_02.csv
+---
+
+data\bronze\raw_batch_03.csv.dvc
+outs:
+- md5: d088c313ed0033d1612100c3dec18600
+  path: raw_batch_03.csv
+---
+
+data\bronze\raw_batch_04.csv.dvc
+outs:
+- md5: d604ce6e38b1217d175614e1727f5dea
+  path: raw_batch_04.csv
+---
+
+data\bronze\raw_batch_05.csv.dvc
+outs:
+- md5: 55bc514a559cff154718f530f85747a9
+  path: raw_batch_05.csv
+---
