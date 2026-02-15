@@ -4,66 +4,134 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '**'
+      - "**"
 
 jobs:
   dvc-evidence:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      # -----------------------------
+      # Checkout
+      # -----------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # -----------------------------
+      # Python setup
+      # -----------------------------
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
+      # -----------------------------
+      # Install dependencies
+      # -----------------------------
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc
 
-      - name: Initialize git (if needed)
+      # -----------------------------
+      # Git identity for CI commits
+      # -----------------------------
+      - name: Configure git identity
         run: |
           git config user.name "CI Bot"
           git config user.email "ci@example.com"
 
+      # -----------------------------
+      # Initialize DVC (REAL SCM MODE)
+      # -----------------------------
       - name: Initialize DVC and local remote
         run: |
-          dvc init --no-scm || true
+          dvc init || true
           mkdir -p dvcstore
-          dvc remote add -d local dvcstore || true
+          dvc remote add -d local ./dvcstore || true
 
-      - name: Prepare data and run simulator
+      # -----------------------------
+      # Prepare dataset batches
+      # -----------------------------
+      - name: Prepare data batches
         run: |
           python src/split_into_batches.py
-          python -u src/simulate_incremental_ingest.py --n 5 --source data/gold/train.csv || true
 
+      # -----------------------------
+      # Simulate incremental ingestion
+      # -----------------------------
+      - name: Run incremental ingestion simulation
+        run: |
+          python -u src/simulate_incremental_ingest.py --n 5 --source data/gold/train.csv
+
+      # -----------------------------
+      # Track datasets with DVC
+      # -----------------------------
       - name: DVC add layers
         run: |
-          dvc add data/bronze || true
-          dvc add data/silver || true
-          dvc add data/gold || true
+          dvc add data/bronze
+          dvc add data/silver
+          dvc add data/gold
 
-      - name: Git commit DVC files
+      # -----------------------------
+      # Reproduce pipeline via DVC
+      # (IMPORTANT: generates DAG + lock)
+      # -----------------------------
+      - name: Reproduce pipeline
         run: |
-          git add data/bronze.dvc data/silver.dvc data/gold.dvc dvc.lock dvc.yaml .gitignore || true
-          git commit -m "CI: add DVC tracking for Bronze/Silver/Gold" || true
+          dvc repro
 
+      # -----------------------------
+      # Commit DVC metadata
+      # -----------------------------
+      - name: Commit DVC files
+        run: |
+          git add \
+            data/bronze.dvc \
+            data/silver.dvc \
+            data/gold.dvc \
+            dvc.lock \
+            dvc.yaml \
+            .gitignore \
+            .dvc/config || true
+          git commit -m "CI: Track datasets with DVC" || true
+
+      # -----------------------------
+      # Collect Evidence
+      # -----------------------------
       - name: Collect DVC & Git evidence
         run: |
           mkdir -p evidence
+
+          echo "Collecting DVC status..."
           dvc status -c > evidence/dvc_status.txt || true
-          dvc dag > evidence/dvc_dag.txt || true
+
+          echo "Generating DAG..."
+          dvc dag --full > evidence/dvc_dag.txt || true
+
+          echo "Collecting metrics..."
           dvc metrics show > evidence/dvc_metrics.txt || true
+
+          echo "Collecting git log..."
           git log --oneline --decorate -n 50 > evidence/git_log.txt || true
+
+          echo "Copying DVC files..."
           cp dvc.lock evidence/ || true
           cp dvc.yaml evidence/ || true
+
+          echo "Saving folder structure..."
           tree data -L 4 > evidence/folder_tree.txt || true
+
+          echo "Saving manifest..."
+          cp manifest.csv evidence/manifest.csv || true
           cp data/bronze/manifest.csv evidence/manifest.csv || true
 
+      # -----------------------------
+      # Upload Artifact
+      # -----------------------------
       - name: Upload evidence artifact
         uses: actions/upload-artifact@v4
         with:
