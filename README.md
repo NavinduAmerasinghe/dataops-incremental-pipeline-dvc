@@ -4,6 +4,14 @@
 
 This project demonstrates a lightweight DataOps pipeline for incremental data ingestion, validation, transformation, and preparation for machine learning workflows. The pipeline follows a typical data engineering lifecycle: splitting raw data into batches, ingesting into a bronze layer, validating and cleaning into a silver layer, transforming features, and finally producing a gold dataset ready for ML modeling. The project is designed for educational purposes, focusing on reproducibility, modularity, and automation using DVC (Data Version Control) and Python scripts.
 
+## Repository Contents
+
+- **Source code:** `src/`
+- **Configuration files:** `dvc.yaml`, `params.yaml`, `requirements.txt`
+- **Pipeline definitions:** `dvc.yaml` and scripts in `src/`
+- **Test scripts:** `tests/`
+- **README (with execution flow and assumptions):** `README.md`
+
 ## What's Covered
 - Incremental data ingestion and batch processing
 - Data validation and cleaning (quality checks, row rejection)
@@ -171,6 +179,3 @@ Design notes
 
 This project provides a hands-on scaffold for learning and practicing DataOps and MLOps principles. By following the pipeline, you will understand how to structure data workflows, enforce data quality, and ensure reproducibility using DVC. The modular scripts and clear data lineage make it easy to extend or adapt for more complex real-world scenarios.
 
----
-
-Use this as a starting scaffold for DataOps / MLOps exercises.
