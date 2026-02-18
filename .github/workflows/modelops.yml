@@ -1,0 +1,41 @@
+name: ModelOps Pipeline
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'data/gold/**'
+
+jobs:
+  build-train-predict:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+      - name: Train model (fail on error)
+        run: python src/train_model.py --register
+
+      - name: Predict on test set
+        run: python src/predict_model.py
+
+      - name: Upload predictions and evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: predictions-and-evidence
+          path: |
+            predictions_test.csv
+            evidence/
