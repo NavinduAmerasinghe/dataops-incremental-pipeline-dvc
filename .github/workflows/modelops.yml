@@ -23,6 +23,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install DVC
+        run: pip install dvc
+
+      - name: Rebuild DVC dataset
+        run: |
+          python -m dvc repro -f
+
+      - name: Verify gold dataset exists
+        run: |
+          if [ ! -d "data/gold" ]; then
+            echo "data/gold directory missing!" >&2
+            exit 1
+          fi
+
       - name: Run tests
         run: pytest
 
