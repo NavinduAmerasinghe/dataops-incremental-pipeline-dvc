@@ -1,0 +1,83 @@
+schema: '2.0'
+stages:
+  split:
+    cmd: python src/split_into_batches.py
+    deps:
+    - path: src/split_into_batches.py
+      hash: md5
+      md5: 1d0fbba53886986a52f811f8f0eadc78
+      size: 2062
+    outs:
+    - path: data/incoming
+      hash: md5
+      md5: 2bc069d50f03f580f0c7d1b6f96a99b9.dir
+      size: 18056
+      nfiles: 5
+  ingest:
+    cmd: python src/ingest_bronze.py
+    deps:
+    - path: data/incoming
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: src/ingest_bronze.py
+      hash: md5
+      md5: d73121338998f59a014df3ee49be9b19
+      size: 1229
+    outs:
+    - path: data/bronze
+      hash: md5
+      md5: c5d953c74cf3ede469b587ab8a043b7c.dir
+      size: 35932
+      nfiles: 6
+  validate:
+    cmd: python src/validate_silver.py
+    deps:
+    - path: data/bronze
+      hash: md5
+      md5: c5d953c74cf3ede469b587ab8a043b7c.dir
+      size: 35932
+      nfiles: 6
+    - path: src/validate_silver.py
+      hash: md5
+      md5: cf9b8acfe061b4f536a5b83e10bf80c8
+      size: 5082
+    outs:
+    - path: data/silver/silver_all.csv
+      hash: md5
+      md5: 630e006ad7e5f21c683f9c736d3e45ed
+      size: 17876
+  transform:
+    cmd: python src/transform_silver.py
+    deps:
+    - path: data/silver/silver_all.csv
+      hash: md5
+      md5: 630e006ad7e5f21c683f9c736d3e45ed
+      size: 17876
+    - path: src/transform_silver.py
+      hash: md5
+      md5: 172cb1f209a34cf6de6c50830f8fea9f
+      size: 1394
+    outs:
+    - path: data/silver/transformed_silver.csv
+      hash: md5
+      md5: 6fc12fa37496187b3c02c156f17f2f8e
+      size: 29509
+  build:
+    cmd: python src/build_gold.py
+    deps:
+    - path: data/silver/transformed_silver.csv
+      hash: md5
+      md5: 6fc12fa37496187b3c02c156f17f2f8e
+      size: 29509
+    - path: src/build_gold.py
+      hash: md5
+      md5: 7b2f33810c0baaff2c6a38fc76b740e7
+      size: 1700
+    outs:
+    - path: data/gold
+      hash: md5
+      md5: 9b3c2f48379b78e72f01f9fd5c4e9e20.dir
+      size: 29797
+      nfiles: 3
