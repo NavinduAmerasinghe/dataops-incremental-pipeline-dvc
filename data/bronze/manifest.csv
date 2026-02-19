@@ -1,6 +1,0 @@
-batch_name,rows_in_batch,raw_path,dvc_checksum,git_commit,recorded_at
-batch_01.csv,100,D:/Studies/Tampere/LECTURES/Autumn Semester_2025(1Aug - 31Dec)/Period 3(2026.1.5-2026.2.31)/MLOPs/Assignment_3_DataOps/mlops-assignment3-dataops/data/bronze/raw_batch_01.csv,cb94c343cdadde5e8e2df23e1472fddc,,2026-02-15T07:42:48.301639
-batch_02.csv,100,D:/Studies/Tampere/LECTURES/Autumn Semester_2025(1Aug - 31Dec)/Period 3(2026.1.5-2026.2.31)/MLOPs/Assignment_3_DataOps/mlops-assignment3-dataops/data/bronze/raw_batch_02.csv,802d9e68e10a327932f67cca0012ae4e,,2026-02-15T07:42:50.909115
-batch_03.csv,100,D:/Studies/Tampere/LECTURES/Autumn Semester_2025(1Aug - 31Dec)/Period 3(2026.1.5-2026.2.31)/MLOPs/Assignment_3_DataOps/mlops-assignment3-dataops/data/bronze/raw_batch_03.csv,d088c313ed0033d1612100c3dec18600,,2026-02-15T07:42:53.560293
-batch_04.csv,100,D:/Studies/Tampere/LECTURES/Autumn Semester_2025(1Aug - 31Dec)/Period 3(2026.1.5-2026.2.31)/MLOPs/Assignment_3_DataOps/mlops-assignment3-dataops/data/bronze/raw_batch_04.csv,d604ce6e38b1217d175614e1727f5dea,,2026-02-15T07:42:56.091065
-batch_05.csv,100,D:/Studies/Tampere/LECTURES/Autumn Semester_2025(1Aug - 31Dec)/Period 3(2026.1.5-2026.2.31)/MLOPs/Assignment_3_DataOps/mlops-assignment3-dataops/data/bronze/raw_batch_05.csv,55bc514a559cff154718f530f85747a9,,2026-02-15T07:42:58.592195
