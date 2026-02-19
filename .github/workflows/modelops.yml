@@ -27,12 +27,8 @@ jobs:
       - name: Install DVC
         run: pip install dvc
 
-      - name: Pull DVC data from remote
-        run: dvc pull
-
-      - name: Rebuild DVC dataset
-        run: |
-          python -m dvc repro -f
+      - name: Rebuild dataset with DVC
+        run: dvc repro -f
 
       - name: Verify gold dataset exists
         run: |
