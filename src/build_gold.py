@@ -23,8 +23,9 @@ def main():
     gold_dir.mkdir(parents=True, exist_ok=True)
 
     if not transformed.exists():
-        print("No transformed silver found. Run transform_silver.py first.")
-        return
+        raise FileNotFoundError(
+            f"Missing file: {transformed}\nRun DVC pipeline (dvc repro -f) before training."
+        )
 
     df = pd.read_csv(transformed)
     # select a subset of ML-ready columns

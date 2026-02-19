@@ -27,13 +27,19 @@ jobs:
       - name: Install DVC
         run: pip install dvc
 
+
       - name: Rebuild dataset with DVC
         run: dvc repro -f
 
+      - name: Debug: list generated data
+        run: find data -maxdepth 3 -type f || true
+
       - name: Verify gold dataset exists
         run: |
-          if [ ! -d "data/gold" ]; then
-            echo "data/gold directory missing!" >&2
+          if [ ! -f "data/gold/gold.csv" ]; then
+            echo "ERROR: data/gold/gold.csv is missing!" >&2
+            echo "Listing files under data for debugging:" >&2
+            find data -maxdepth 3 -type f || true
             exit 1
           fi
 
