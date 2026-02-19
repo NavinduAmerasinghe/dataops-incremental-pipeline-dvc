@@ -65,10 +65,39 @@ def main():
     y_pred_baseline = X_val["lag1_humidity"].values
     metrics_baseline = evaluate(y_val, y_pred_baseline)
 
-    # Ridge regression
-    model = Ridge(random_state=RANDOM_SEED)
-    model.fit(X_train, y_train)
-    y_pred_ridge = model.predict(X_val)
+
+    # Hyperparameter tuning for Ridge regression (manual grid search)
+    best_alpha = None
+    best_score = float('inf')
+    best_model = None
+    best_pred = None
+    alphas = [0.01, 0.1, 1.0, 10.0, 100.0]
+    tuning_results = []
+    for alpha in alphas:
+        model = Ridge(alpha=alpha, random_state=RANDOM_SEED)
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_val)
+        mae = np.mean(np.abs(y_val - y_pred))
+        rmse = np.sqrt(np.mean((y_val - y_pred) ** 2))
+        tuning_results.append({"alpha": alpha, "mae": mae, "rmse": rmse})
+        mlflow.log_metric(f"ridge_mae_alpha_{alpha}", mae)
+        mlflow.log_metric(f"ridge_rmse_alpha_{alpha}", rmse)
+        if mae < best_score:
+            best_score = mae
+            best_alpha = alpha
+            best_model = model
+            best_pred = y_pred
+    # Log best alpha
+    mlflow.log_param("ridge_best_alpha", best_alpha)
+    # Log all tuning results as artifact
+    import json
+    os.makedirs("evidence", exist_ok=True)
+    with open("evidence/ridge_tuning_results.json", "w", encoding="utf-8") as f:
+        json.dump(tuning_results, f, indent=2)
+    mlflow.log_artifact("evidence/ridge_tuning_results.json")
+    # Use best model
+    model = best_model
+    y_pred_ridge = best_pred
     metrics_ridge = evaluate(y_val, y_pred_ridge)
 
     # Data version and git info
