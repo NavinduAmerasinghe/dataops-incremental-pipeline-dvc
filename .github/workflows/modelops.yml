@@ -2,34 +2,45 @@ name: ModelOps Pipeline
 
 on:
   push:
+    branches: [ main ]
     paths:
       - 'src/**'
-      - 'data/gold/**'
+      - 'dvc.yaml'
+      - 'dvc.lock'
+      - 'params.yaml'
+      - 'requirements.txt'
+      - '.github/workflows/**'
 
 jobs:
   build-train-predict:
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
+      # Install DVC
       - name: Install DVC
         run: pip install dvc
 
+      # Rebuild dataset (NO REMOTE NEEDED)
       - name: Rebuild dataset with DVC
         run: dvc repro -f
 
+      # Safety check
       - name: Verify gold dataset exists
         run: |
           if [ ! -d "data/gold" ]; then
@@ -37,15 +48,19 @@ jobs:
             exit 1
           fi
 
+      # Run unit tests
       - name: Run tests
         run: pytest
 
-      - name: Train model (fail on error)
+      # Train model
+      - name: Train model
         run: python -m src.train_model --register
 
+      # Predict
       - name: Predict on test set
         run: python -m src.predict_model
 
+      # Upload outputs
       - name: Upload predictions and evidence
         uses: actions/upload-artifact@v4
         with:
