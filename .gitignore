@@ -24,9 +24,19 @@ Thumbs.db
 # Logs
 *.log
 
-data/incoming/
-data/bronze/
-data/silver/
-data/gold/
-data/_staging_batches/
+data/incoming/**
+!data/incoming/.gitignore
+!data/incoming/*.dvc
+data/bronze/**
+!data/bronze/.gitignore
+!data/bronze/*.dvc
+data/silver/**
+!data/silver/.gitignore
+!data/silver/*.dvc
+data/gold/**
+!data/gold/.gitignore
+!data/gold/*.dvc
+data/_staging_batches/**
+!data/_staging_batches/.gitignore
+!data/_staging_batches/*.dvc
 
