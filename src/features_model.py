@@ -42,6 +42,30 @@ def build_features(
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"File not found: {csv_path}")
     df = pd.read_csv(csv_path, parse_dates=True)
+    # DEBUG: Print columns for inspection
+    print("[DEBUG] DataFrame columns:", list(df.columns))
+
+    # --- DYNAMIC HUMIDITY COLUMN DETECTION ---
+    # ModelOps best practice: Dataset schemas may change across versions, so we must
+    # dynamically detect the humidity column instead of hardcoding. This ensures
+    # feature engineering is robust to evolving data pipelines and supports reproducibility.
+    # Add 'target' as a fallback for legacy or generic datasets
+    preferred_candidates = ["humidity", "Humidity", "hum", "relative_humidity", "RH", "target"]
+    humidity_col_found = None
+    for candidate in preferred_candidates:
+        if candidate in df.columns:
+            humidity_col_found = candidate
+            break
+    if humidity_col_found is None:
+        # Search for any column containing 'humid' (case-insensitive)
+        for col in df.columns:
+            if "humid" in col.lower():
+                humidity_col_found = col
+                break
+    if humidity_col_found is None:
+        raise ValueError(f"No humidity column found. Available columns: {list(df.columns)}")
+    humidity_col = humidity_col_found
+    print(f"[DEBUG] Using humidity column: {humidity_col}")
     # Auto-detect datetime column if not provided
     if datetime_col is None:
         for col in df.columns:
@@ -58,7 +82,8 @@ def build_features(
     df[datetime_col] = pd.to_datetime(df[datetime_col])
     df = df.sort_values(datetime_col).reset_index(drop=True)
 
-    # Target: next-day humidity
+    # Target: next-day humidity (dynamically detected column)
+    # Use shift(-1) to align each row's features with the next day's humidity value as the target
     df["target_humidity"] = df[humidity_col].shift(-1)
 
     # Features
@@ -79,6 +104,10 @@ def build_features(
         feature_cols.append("lag1_temperature")
     X = df[feature_cols].copy()
     y = df["target_humidity"].copy()
+    # Drop any rows with NaN in features or target (common after shifting/rolling)
+    mask = ~(X.isna().any(axis=1) | y.isna())
+    X = X[mask]
+    y = y[mask]
     return X, y
 
 if __name__ == "__main__":

@@ -19,6 +19,8 @@ Features:
 """
 
 import argparse
+import mlflow
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 import os
 import numpy as np
 import pandas as pd
@@ -109,6 +111,9 @@ def main():
 
     # MLflow logging
     mlflow.set_experiment(args.experiment_name)
+    # End any previous run before starting a new one
+    if mlflow.active_run() is not None:
+        mlflow.end_run()
     with mlflow.start_run():
         mlflow.log_param("model_type", "Ridge")
         mlflow.log_param("random_seed", RANDOM_SEED)

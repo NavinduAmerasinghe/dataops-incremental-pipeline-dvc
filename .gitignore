@@ -24,6 +24,26 @@ Thumbs.db
 # Logs
 *.log
 
+# MLflow
+mlruns/
+mlartifacts/
+
+# Evidence outputs
+evidence/
+predictions_test.csv
+
+# Model artifacts
+*.joblib
+*.pkl
+*.png
+*.log
+*.txt
+*.json
+
+# Python
+.venv/
+__pycache__/
+
 data/incoming/**
 !data/incoming/.gitignore
 !data/incoming/*.dvc

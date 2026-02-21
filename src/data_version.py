@@ -13,20 +13,23 @@ def get_data_version_id(dvc_lock_path: str = "dvc.lock", dataset_path: str = "da
     data_version_id = None
     row_count = None
     if os.path.exists(dvc_lock_path):
-        with open(dvc_lock_path, "r", encoding="utf-8") as f:
-            lock_data = json.load(f)
-        # Try to extract hash from dvc.lock (supports both md5 and sha256)
-        for stage in lock_data.get("stages", {}).values():
-            outs = stage.get("outs", [])
-            for out in outs:
-                if "md5" in out:
-                    data_version_id = out["md5"]
-                elif "sha256" in out:
-                    data_version_id = out["sha256"]
+        try:
+            with open(dvc_lock_path, "r", encoding="utf-8") as f:
+                lock_data = json.load(f)
+            # Try to extract hash from dvc.lock (supports both md5 and sha256)
+            for stage in lock_data.get("stages", {}).values():
+                outs = stage.get("outs", [])
+                for out in outs:
+                    if "md5" in out:
+                        data_version_id = out["md5"]
+                    elif "sha256" in out:
+                        data_version_id = out["sha256"]
+                    if data_version_id:
+                        break
                 if data_version_id:
                     break
-            if data_version_id:
-                break
+        except Exception as e:
+            print(f"[WARN] Failed to load dvc.lock as JSON: {e}. Falling back to dataset hash.")
     if not data_version_id:
         # Fallback: hash the dataset file
         if os.path.exists(dataset_path):

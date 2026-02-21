@@ -29,14 +29,18 @@ def main():
 
     # Load test data and build features
     X_test, _ = build_features(csv_path=test_path)
+    # Also load original test data for output
+    df_test_raw = pd.read_csv(test_path)
 
     # Load latest registered model from MLflow Model Registry
     model_uri = f"models:/{model_name}/latest"
     model = mlflow.sklearn.load_model(model_uri)
     y_pred = model.predict(X_test)
 
-    # Output predictions
-    df_pred = pd.DataFrame({"prediction": y_pred})
+    # Align test rows with predictions (drop rows with NaN in features or target)
+    df_test_filtered = df_test_raw.loc[X_test.index].reset_index(drop=True)
+    df_pred = df_test_filtered.copy()
+    df_pred["prediction"] = y_pred
     df_pred.to_csv(output_path, index=False)
 
     # Data version and git info
