@@ -61,8 +61,20 @@ def main():
     parser.add_argument("--register", action="store_true", help="Register best model to MLflow Model Registry")
     args = parser.parse_args()
 
+
     # Feature engineering
     X, y = build_features(csv_path=args.data_path)
+    # Fail fast if no data
+    if X.shape[0] == 0 or y.shape[0] == 0:
+        print("[ERROR] No training data after feature engineering.\n"
+              f"Gold dataset path: {args.data_path}\n"
+              f"Columns: {list(X.columns) if hasattr(X, 'columns') else X}\n"
+              f"Shape: {X.shape}\n"
+              "Check that the gold dataset is generated and contains valid data with the expected schema.\n"
+              "This often means the data pipeline did not produce any usable rows.\n"
+              "You can debug by printing the head of the gold file in your workflow before training.")
+        import sys
+        sys.exit(1)
     # Time-based split
     X_train, X_val, y_train, y_val = time_split(X, y, split_ratio=0.8)
 
