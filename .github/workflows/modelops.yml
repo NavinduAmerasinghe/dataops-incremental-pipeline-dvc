@@ -45,6 +45,11 @@ jobs:
             exit 1
           fi
 
+      - name: Set MLflow local tracking URIs
+        run: |
+          echo "MLFLOW_TRACKING_URI=file:${{ github.workspace }}/mlruns" >> $GITHUB_ENV
+          echo "MLFLOW_REGISTRY_URI=file:${{ github.workspace }}/mlruns" >> $GITHUB_ENV
+
       - name: Train model
         run: python src/train_model.py --experiment-name climate_forecast --register
 
