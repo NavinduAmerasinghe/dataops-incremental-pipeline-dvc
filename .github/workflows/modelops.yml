@@ -28,6 +28,23 @@ jobs:
       - name: Run tests
         run: pytest tests
 
+      - name: Generate gold dataset with DVC if available
+        run: |
+          if [ -f dvc.yaml ]; then
+            python -m dvc repro || true
+          fi
+          if [ ! -f data/gold/gold.csv ]; then
+            python src/split_into_batches.py
+            python src/ingest_bronze.py
+            python src/validate_silver.py
+            python src/transform_silver.py
+            python src/build_gold.py
+          fi
+          if [ ! -f data/gold/gold.csv ]; then
+            echo "gold.csv not found after pipeline steps" >&2
+            exit 1
+          fi
+
       - name: Train model
         run: python src/train_model.py --experiment-name climate_forecast --register
 
@@ -37,5 +54,5 @@ jobs:
       - name: Upload prediction artifact
         uses: actions/upload-artifact@v4
         with:
-          name: predictions
+          name: predictions_test
           path: predictions_test.csv
