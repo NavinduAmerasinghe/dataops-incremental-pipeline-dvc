@@ -34,6 +34,41 @@ This project demonstrates a lightweight DataOps pipeline for incremental data in
 
 ## How to Run the Pipeline
 
+
+## How to Run MLflow
+
+This project uses [MLflow](https://mlflow.org/) for experiment tracking, model logging, and model registry. MLflow is required for training, tracking, and serving models.
+
+### 1. Install MLflow (if not already installed)
+```bash
+pip install mlflow
+```
+
+### 2. Start the MLflow Tracking Server
+By default, scripts log to a local MLflow server at `http://127.0.0.1:5000`. Start the server in a new terminal:
+```bash
+mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlartifacts --host 127.0.0.1 --port 5000
+```
+This will launch the MLflow UI at [http://127.0.0.1:5000](http://127.0.0.1:5000).
+
+### 3. Run Training and Log Experiments
+Train the model and log runs to MLflow:
+```bash
+python src/train_model.py --data-path data/gold/gold.csv --experiment-name climate_forecast --register
+```
+This will log parameters, metrics, artifacts, and register the best model in the MLflow Model Registry.
+
+### 4. Run Inference Using the Latest Registered Model
+```bash
+python src/predict_model.py
+```
+This loads the latest registered model from MLflow and outputs predictions to `predictions_test.csv`.
+
+### 5. View the MLflow UI
+Open your browser and go to [http://127.0.0.1:5000](http://127.0.0.1:5000) to view experiments, runs, models, and artifacts.
+
+---
+
 You can run the pipeline step-by-step or use DVC to orchestrate the workflow.
 
 **Manual (sequential) execution:**
